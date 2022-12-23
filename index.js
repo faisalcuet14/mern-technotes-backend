@@ -1,6 +1,8 @@
 require("dotenv").config();
 const express = require("express");
 const path = require("path");
+const cors = require("cors");
+const { corsOptions } = require("./config/corsOptions");
 const errorHandler = require("./middleware/errorHandler");
 const { logger } = require("./middleware/logger");
 const rootdir = require("./rootdir");
@@ -16,6 +18,8 @@ app.use(logger);
 app.use(express.urlencoded({ extended: false }));
 // handle json
 app.use(express.json());
+// handle Cross Origin Resource Sharing (CORS) access
+app.use(cors(corsOptions));
 // serve static files
 app.use(express.static("public"));
 
