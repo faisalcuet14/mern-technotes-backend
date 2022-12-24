@@ -4,12 +4,17 @@ const path = require("path");
 const cors = require("cors");
 const { corsOptions } = require("./config/corsOptions");
 const errorHandler = require("./middleware/errorHandler");
-const { logger } = require("./middleware/logger");
+const { logger, logEvent } = require("./middleware/logger");
 const rootdir = require("./rootdir");
+const connectDB = require("./config/dbConn");
+const mongoose = require("mongoose");
 
 // initiate app
 const app = express();
 const PORT = process.env.PORT || 3500;
+
+// connect to database
+connectDB();
 
 // log incoming request
 app.use(logger);
@@ -26,6 +31,9 @@ app.use(express.static("public"));
 // handle root
 app.use("/", require("./routes/root"));
 
+// handle users route
+app.use("/users", require("./routes/users"));
+
 // handle 404 pages
 app.get("*", (req, res) => {
   res.status(404);
@@ -41,7 +49,17 @@ app.get("*", (req, res) => {
 // log all server processing errors and send response
 app.use(errorHandler);
 
-// create and listen to server
-app.listen(PORT, () => {
-  console.log(`server running on port ${PORT}`);
+// listen to server after database connection
+mongoose.connection.once("connected", () => {
+  console.log("connected to database");
+  app.listen(PORT, () => {
+    console.log(`server running on port ${PORT}`);
+  });
+});
+
+// log database error
+mongoose.connection.on("error", (err) => {
+  console.log(err);
+  const mongoErr = `${err.no}: ${err.code}\tsyscall:${err.syscall}\thostname:${err.hostname}`;
+  logEvent(mongoErr, "mongoLogs.log");
 });
