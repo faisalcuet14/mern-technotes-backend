@@ -100,7 +100,7 @@ const deleteUser = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: "user has notes assigned" });
   }
   // check if user exists in db
-  const user = await User.findById(id).select("-password").exec();
+  const user = await User.findById(id).exec();
   if (!user) {
     return res.status(400).json({ messgae: "user not found" });
   }
