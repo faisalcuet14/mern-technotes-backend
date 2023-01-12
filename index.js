@@ -33,6 +33,8 @@ app.use("/", require("./routes/root"));
 
 // handle users route
 app.use("/users", require("./routes/users"));
+// handle notes route
+app.use("/notes", require("./routes/notes"));
 
 // handle 404 pages
 app.get("*", (req, res) => {
